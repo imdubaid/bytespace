@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import Providers from '@/providers';
+import Header from '@/components/main/header';
+import Drawer from '@/components/main/drawer';
+import { DrawerWidth } from '@/constants/elements';
+import Stack from '@mui/material/Stack';
 import '@/styles/globals.css';
 import '@/styles/googleSans.css';
 
@@ -17,9 +20,21 @@ export default function RootLayout({
     return (
         <html lang='en' className='h-full antialiased'>
             <body>
-                <AppRouterCacheProvider>
-                    <Providers>{children}</Providers>
-                </AppRouterCacheProvider>
+                <Providers>
+                    <Header />
+                    <Stack
+                        sx={{
+                            width: { xs: '100%', xm: `calc(100% - ${DrawerWidth}px)` },
+                            marginLeft: { xs: 0, xm: `${DrawerWidth}px` },
+                            height: `calc(100vh - 64px)`,
+                            overflowX: 'hidden',
+                            overflowY: 'auto',
+                        }}>
+                        <Drawer />
+
+                        {children}
+                    </Stack>
+                </Providers>
             </body>
         </html>
     );
