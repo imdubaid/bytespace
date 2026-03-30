@@ -14,6 +14,15 @@ const ThemeProvider = (props: ThemeProviderProps) => {
                 palette: {
                     mode: 'light',
                 },
+                typography: {
+                    fontFamily: '"Google Sans Flex", "Google Sans", Roboto, Arial, sans-serif;',
+                    h5: {
+                        fontSize: 28,
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        letterSpacing: 'normal',
+                    },
+                },
             }),
         [],
     );
