@@ -1,5 +1,8 @@
-import { getAuthClient } from '@/lib/apiClient';
+import { CLIENT_NAME } from '@/lib/env';
+import ssoClient from '@/lib/ssoClient';
+import { publicRoutes } from '@/routes';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -7,18 +10,17 @@ export async function GET(req: Request) {
     const next = searchParams.get('next') ?? '/';
 
     if (!code) {
-        throw new Error('Authentication failed: Missing code parameter');
+        return redirect(publicRoutes.error + '?error=Authentication failed: Missing code parameter');
     }
 
-    const authClient = await getAuthClient();
     const clientId = process.env.CLIENT_ID!;
 
     try {
-        const response = await authClient.post('/api/sso/exchange', { code, client_id: clientId });
+        const response = await ssoClient.post('/api/sso/token', { code, client_id: clientId });
         const cookieStore = await cookies();
 
         const token = response.data?.access_token;
-        cookieStore.set('auth.session-token', token, {
+        cookieStore.set(CLIENT_NAME + '.session-token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -27,6 +29,6 @@ export async function GET(req: Request) {
         return Response.redirect(next, 302);
     } catch (error) {
         console.error('SSO callback error:', error);
-        throw new Error('Authentication failed: Unable to complete SSO process');
+        return redirect(publicRoutes.error + '?error=Authentication failed: Unable to complete SSO process');
     }
 }
