@@ -1,9 +1,5 @@
 import type { Metadata } from 'next';
 import Providers from '@/providers';
-import Header from '@/components/main/header';
-import Drawer from '@/components/main/drawer';
-import { DrawerWidth } from '@/constants/elements';
-import Stack from '@mui/material/Stack';
 import '@/styles/globals.css';
 import '@/styles/googleSans.css';
 
@@ -19,22 +15,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang='en' className='h-full antialiased'>
-            <body>
-                <Providers>
-                    <Header />
-                    <Stack
-                        sx={{
-                            width: { xs: '100%', xm: `calc(100% - ${DrawerWidth}px)` },
-                            marginLeft: { xs: 0, xm: `${DrawerWidth}px` },
-                            height: `calc(100vh - 64px)`,
-                            overflowX: 'hidden',
-                            overflowY: 'auto',
-                        }}>
-                        <Drawer />
-
-                        {children}
-                    </Stack>
-                </Providers>
+            <body style={{ height: '100dvh' }}>
+                <Providers>{children}</Providers>
             </body>
         </html>
     );
