@@ -1,18 +1,11 @@
 'use client';
 
-import { Fragment, type CSSProperties } from 'react';
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-    Drawer as MuiDrawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    useMediaQuery,
-} from '@mui/material';
+import { Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery } from '@mui/material';
 import { routes } from './navList';
+import New from './new';
 
 function Drawer() {
     const pathname = usePathname();
@@ -35,38 +28,27 @@ function Drawer() {
                     },
                 }}
                 suppressHydrationWarning>
+                <New />
+
                 <List sx={{ py: 2.5 }}>
-                    {routes
-                        .map((route) => {
-                            const isActive =
-                                route.link === '/' ? pathname === '/' : pathname.startsWith(route.link);
+                    {routes.map(route => {
+                        const isActive = route.link === '/' ? pathname === '/' : pathname.startsWith(route.link);
 
-                            const style = {
-                                '--nav-icon-bg': route.iconBgColor,
-                                '--nav-icon-fg': route.iconColor,
-                            } as CSSProperties;
-
-                            return (
-                                <ListItem key={route.link} disablePadding component={Link} href={route.link}>
-                                    <ListItemButton
-                                        variant='navItem'
-                                        selected={isActive}
-                                        style={style}
-                                        component='div'
-                                        suppressHydrationWarning>
-                                        <ListItemIcon variant='navIcon'>
-                                            <route.icon size={24} suppressHydrationWarning />
-                                        </ListItemIcon>
-                                        <ListItemText primary={route.name} />
-                                    </ListItemButton>
-                                </ListItem>
-                            );
-                        })}
+                        return (
+                            <ListItem key={route.link} disablePadding component={Link} href={route.link}>
+                                <ListItemButton variant='navItem' selected={isActive} component='div' suppressHydrationWarning>
+                                    <ListItemIcon variant='navIcon'>
+                                        <route.icon size={24} suppressHydrationWarning />
+                                    </ListItemIcon>
+                                    <ListItemText primary={route.name} />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    })}
                 </List>
             </MuiDrawer>
         </Fragment>
     );
 }
-
 
 export default Drawer;

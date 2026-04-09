@@ -2,6 +2,8 @@
 
 import React, { useMemo } from 'react';
 import { CssBaseline, ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
+import { components } from '@/theme/components';
+
 interface ThemeProviderProps {
     children: React.ReactNode;
 }
@@ -23,6 +25,7 @@ const ThemeProvider = (props: ThemeProviderProps) => {
                         letterSpacing: 'normal',
                     },
                 },
+                components,
             }),
         [],
     );
