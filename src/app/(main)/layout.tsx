@@ -3,8 +3,6 @@ import Header from '@/components/main/header';
 import Drawer from '@/components/main/drawer';
 import { DrawerWidth } from '@/constants/elements';
 import Stack from '@mui/material/Stack';
-import '@/styles/globals.css';
-import '@/styles/googleSans.css';
 
 export const metadata: Metadata = {
     title: 'ByteSpace',

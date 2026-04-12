@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 // import Drawer from '@/components/main/drawer';
 import { Avatar, Menu, Stack, Typography } from '@mui/material';
-import useMenu from '@/hooks/useMenu';
+import useMenu from '@/hooks/use-menu';
 import MenuItem from '@mui/material/MenuItem';
 import { logout } from '@/actions/auth';
 

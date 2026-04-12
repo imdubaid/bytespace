@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Providers from '@/providers';
 import '@/styles/globals.css';
-import '@/styles/googleSans.css';
+import '@/styles/google-sans.css';
 
 export const metadata: Metadata = {
     title: 'ByteSpace',

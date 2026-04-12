@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery } from '@mui/material';
-import { routes } from './navList';
+import { routes } from '@/components/main/nav-list';
 import New from './new';
 
 function Drawer() {
