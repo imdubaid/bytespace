@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { authRoutes, publicRoutes, DEFAULT_ROUTE } from '@/routes';
-import { auth, autoSignIn } from './auth';
+import { decodeJWT } from '@/utils/session-token';
+import { publicRoutes } from '@/routes';
+import { ssoConfig } from '@/configs/sso';
 
 const match = (currentPath: string, paths: string[]) => {
     return paths.some(path => {
@@ -12,36 +13,35 @@ const match = (currentPath: string, paths: string[]) => {
     });
 };
 
-export async function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
     const path = req.nextUrl.pathname;
-    const isAuthRoute = match(path, Object.values(authRoutes));
     const isPublicRoute = match(path, Object.values(publicRoutes));
-    const isLoggedIn = await auth();
+    const ssoAttempted = req.cookies.get('sso_attempted')?.value === 'true';
+    const ssoRedirectCount = parseInt(req.cookies.get('sso_redirect_count')?.value ?? '0', 10);
 
-    // console.log('Middleware check:', { path, isAuthRoute, isPublicRoute, isLoggedIn });
-
-    if (!isLoggedIn && !isPublicRoute && !isAuthRoute) {
-        return autoSignIn(req);
-    }
+    const token = req.cookies.get(ssoConfig.cookies.session.name)?.value;
+    const isLoggedIn = !!decodeJWT(token);
 
     if (isPublicRoute) return NextResponse.next();
 
-    if (!isLoggedIn && !isAuthRoute) return NextResponse.redirect(new URL('/', req.nextUrl));
+    if (!isLoggedIn) {
+        if (ssoRedirectCount >= 3) {
+            return NextResponse.redirect(new URL('/error?error=SSO redirect limit exceeded', req.url));
+        }
 
-    if (isLoggedIn && isAuthRoute) return NextResponse.redirect(new URL(DEFAULT_ROUTE, req.nextUrl));
+        if (!ssoAttempted) {
+            const path = req.nextUrl.pathname + req.nextUrl.search;
+            const signIn = new URL(publicRoutes.signIn, req.url);
+            signIn.searchParams.set('path', path);
+            return NextResponse.redirect(signIn);
+        }
+
+        return NextResponse.redirect(new URL('/error?error=sso_timeout', req.url));
+    }
 
     return NextResponse.next();
 }
 
-// Configure which paths the middleware should run on
-/*
- * Match all request paths except for the ones starting with:
- * - api (API routes)
- * - _next/static (static files)
- * - _next/image (image optimization files)
- * - favicon.ico (favicon file)
- * - public folder
- */
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images|.well-known).*)'],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|fonts|images|public|assets|.well-known).*)'],
 };

@@ -168,6 +168,13 @@ export function getAbsolutePath(path?: string): string {
     return `${CLIENT_URL}${parsedPath}`;
 }
 
+export function normalizePath(path?: string): string {
+    if (!path) return '/';
+
+    if (!path.startsWith('/') || path.startsWith('//')) return `/${path}`;
+    return path;
+}
+
 export function now() {
     return Math.floor(Date.now() / 1000);
 }

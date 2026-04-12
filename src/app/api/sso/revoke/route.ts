@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CLIENT_NAME, CLIENT_SECRET } from '@/lib/env';
-import { getAbsolutePath } from '@/utils/helpers';
+import { CLIENT_SECRET } from '@/lib/env';
+import { ssoConfig } from '@/configs/sso';
 
 export async function POST(req: NextRequest) {
     const clientSecret = req.headers.get('x-client-secret');
@@ -10,12 +10,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Clear the user's session cookie
-    const basePath = getAbsolutePath();
-    const response = NextResponse.redirect(basePath);
-
-    response.cookies.delete(CLIENT_NAME + '.session-token');
-    response.cookies.delete(CLIENT_NAME + '.csrf-token');
-    response.cookies.delete(CLIENT_NAME + '.callback-url');
+    const response = NextResponse.json({ message: 'Session revoked' }, { status: 200 });
+    response.cookies.delete(ssoConfig.cookies.session.name);
+    console.log('Revoked session');
 
     return response;
 }

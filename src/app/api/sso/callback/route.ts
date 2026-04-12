@@ -1,34 +1,41 @@
-import { CLIENT_NAME } from '@/lib/env';
-import ssoClient from '@/lib/ssoClient';
-import { publicRoutes } from '@/routes';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { CLIENT_ID, CLIENT_NAME, IS_PRODUCTION } from '@/lib/env';
+import ssoClient from '@/lib/sso-client';
+import { error, next } from '@/utils/sso';
+
+function sessionCookieOptions() {
+    return {
+        path: '/' as const,
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: (IS_PRODUCTION ? 'none' : 'lax') as 'none' | 'lax',
+        maxAge: 60 * 60 * 24,
+    };
+}
+
+const cookieName = `${CLIENT_NAME}.session-token`;
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
-    const next = searchParams.get('next') ?? '/';
+    const nextParam = searchParams.get('next') ?? '/';
 
     if (!code) {
-        return redirect(publicRoutes.error + '?error=Authentication failed: Missing code parameter');
+        return error('Missing authorization code');
     }
 
-    const clientId = process.env.CLIENT_ID!;
-
     try {
-        const response = await ssoClient.post('/api/sso/token', { code, client_id: clientId });
-        const cookieStore = await cookies();
+        const res = await ssoClient.post('/api/sso/token', { code, client_id: CLIENT_ID });
+        const token = res.data?.access_token;
 
-        const token = response.data?.access_token;
-        cookieStore.set(CLIENT_NAME + '.session-token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-        });
+        if (!token) {
+            return error('No access token from SSO');
+        }
 
-        return Response.redirect(next, 302);
-    } catch (error) {
-        console.error('SSO callback error:', error);
-        return redirect(publicRoutes.error + '?error=Authentication failed: Unable to complete SSO process');
+        const response = next(nextParam);
+        response.cookies.set(cookieName, token, sessionCookieOptions());
+        return response;
+    } catch (err) {
+        console.error('SSO callback error:', err);
+        return error('Authentication failed: Unable to complete SSO process');
     }
 }
