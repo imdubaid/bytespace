@@ -1,5 +1,4 @@
-import { NewButton } from '@/components/styled/button';
-import React from 'react';
+import { NewButton } from '@/components/ui/button';
 
 function New() {
     return <NewButton />;

@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorPage } from '@/components/notFound';
+import { ErrorPage } from '@/components/ui/not-found';
 import { useSearchParams } from 'next/navigation';
 
 export default function AuthErrorPageComponent() {

@@ -2,10 +2,35 @@
 
 import { Button, IconButton, Link, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
-import { IoArrowBack } from 'react-icons/io5';
+import { IoAddOutline, IoArrowBack } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import type { ButtonProps } from '@mui/material';
 import type { TypographyProps } from '@mui/material';
+
+export const NewButton = () => {
+    return (
+        <Button
+            variant='contained'
+            shape='rounded'
+            disableElevation
+            sx={{
+                maxWidth: 115,
+                width: '100%',
+                minHeight: 56,
+                backgroundColor: 'background.paper',
+                color: 'text.primary',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+
+                '&:hover': {
+                    backgroundColor: 'action.hover',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+                },
+            }}
+            startIcon={<IoAddOutline />}>
+            New
+        </Button>
+    );
+}
 
 export type BackButtonProps = PropsWithChildren<ButtonProps> & {
     iconButton?: boolean;
