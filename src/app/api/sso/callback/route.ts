@@ -1,18 +1,8 @@
-import { CLIENT_ID, CLIENT_NAME, IS_PRODUCTION } from '@/lib/env';
 import ssoClient from '@/lib/sso-client';
 import { error, next } from '@/utils/sso';
+import { ssoConfig } from '@/configs/sso';
 
-function sessionCookieOptions() {
-    return {
-        path: '/' as const,
-        httpOnly: true,
-        secure: IS_PRODUCTION,
-        sameSite: (IS_PRODUCTION ? 'none' : 'lax') as 'none' | 'lax',
-        maxAge: 60 * 60 * 24,
-    };
-}
-
-const cookieName = `${CLIENT_NAME}.session-token`;
+const cookieName = ssoConfig.cookies.session.name;
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -24,7 +14,7 @@ export async function GET(req: Request) {
     }
 
     try {
-        const res = await ssoClient.post('/api/sso/token', { code, client_id: CLIENT_ID });
+        const res = await ssoClient.post(ssoConfig.client.path.token, { code, client_id: ssoConfig.app.id });
         const token = res.data?.access_token;
 
         if (!token) {
@@ -32,7 +22,7 @@ export async function GET(req: Request) {
         }
 
         const response = next(nextParam);
-        response.cookies.set(cookieName, token, sessionCookieOptions());
+        response.cookies.set(cookieName, token, ssoConfig.cookies.session.options);
         return response;
     } catch (err) {
         console.error('SSO callback error:', err);

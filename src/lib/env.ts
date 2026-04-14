@@ -1,8 +1,10 @@
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-export const CLIENT_ID = process.env.CLIENT_ID!;
-export const CLIENT_NAME = process.env.CLIENT_NAME!;
-export const CLIENT_SECRET = process.env.CLIENT_SECRET;
-export const CLIENT_URL = process.env.CLIENT_URL;
+export const APP_ID = process.env.APP_ID!;
+export const APP_NAME = process.env.APP_NAME!;
+export const APP_SECRET = process.env.APP_SECRET;
+export const APP_URL = process.env.APP_URL;
 
 export const SSO_CLIENT = process.env.SSO_CLIENT!;
+
+export const REDIS_URL = process.env.REDIS_URL!;

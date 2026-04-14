@@ -3,26 +3,23 @@
 import { cookies } from 'next/headers';
 import { Session } from '@/types/auth';
 import ssoClient from '@/lib/sso-client';
-import { CLIENT_ID, CLIENT_NAME } from '@/lib/env';
-import { decodeJWT } from '@/utils/session-token';
+import { decodeJWT } from '@/utils/jwt';
 import { ssoConfig } from '@/configs/sso';
-
-const cookieName = `${CLIENT_NAME}.session-token`;
 
 export async function auth(): Promise<Session | null> {
     const cookieStore = await cookies();
-    const token = cookieStore.get(cookieName)?.value;
+    const token = cookieStore.get(ssoConfig.cookies.session.name)?.value;
     return decodeJWT(token);
 }
 
 export async function logout() {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get(cookieName)?.value;
+    const accessToken = cookieStore.get(ssoConfig.cookies.session.name)?.value;
 
     try {
         const res = await ssoClient.post(
-            ssoConfig.paths.revoke,
-            { client_id: CLIENT_ID },
+            ssoConfig.client.path.revoke,
+            { client_id: ssoConfig.app.id },
             {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,

@@ -1,4 +1,4 @@
-import { CLIENT_URL } from '@/lib/env';
+import { APP_URL } from '@/lib/env';
 
 // Type definitions
 type AnyObject = Record<string, any>;
@@ -165,7 +165,7 @@ export function calculatePercentage(value: number, total: number): number {
 
 export function getAbsolutePath(path?: string): string {
     const parsedPath = path ? (path.startsWith('/') ? path : `/${path}`) : '';
-    return `${CLIENT_URL}${parsedPath}`;
+    return `${APP_URL}${parsedPath}`;
 }
 
 export function normalizePath(path?: string): string {

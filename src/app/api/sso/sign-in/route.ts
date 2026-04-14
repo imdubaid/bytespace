@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { CLIENT_ID, IS_PRODUCTION } from '@/lib/env';
+import { IS_PRODUCTION } from '@/lib/env';
+import { ssoConfig } from '@/configs/sso';
 import { authRoutes } from '@/routes';
 
 export async function GET(req: NextRequest) {
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     const redirectURI = `${req.nextUrl.origin}/api/sso/callback`;
 
     const authorize = new URL(authRoutes.auth);
-    authorize.searchParams.set('client_id', CLIENT_ID);
+    authorize.searchParams.set('client_id', ssoConfig.app.id);
     authorize.searchParams.set('redirect_uri', redirectURI);
     authorize.searchParams.set('next', next);
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { CLIENT_SECRET, SSO_CLIENT } from './env';
+import { SSO_CLIENT } from './env';
+import { ssoConfig } from '@/configs/sso';
 
 export default axios.create({
     baseURL: SSO_CLIENT,
@@ -7,6 +8,6 @@ export default axios.create({
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
-        'x-client-secret': CLIENT_SECRET,
+        'x-client-secret': ssoConfig.app.secret,
     },
 });
