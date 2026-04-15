@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { decodeJWT } from '@/utils/jwt';
 import { publicRoutes } from '@/routes';
-import { ssoConfig } from '@/configs/sso';
-import getRedis from './lib/redis';
-import { RedisKeys } from './constants/keys';
+import { isSessionValid } from './actions/auth';
+import { ssoConfig } from './configs/sso';
 
 const match = (currentPath: string, paths: string[]) => {
     return paths.some(path => {
@@ -20,21 +18,12 @@ export default async function proxy(req: NextRequest) {
     const isPublicRoute = match(path, Object.values(publicRoutes));
     const ssoAttempted = req.cookies.get('sso_attempted')?.value === 'true';
     const ssoRedirectCount = parseInt(req.cookies.get('sso_redirect_count')?.value ?? '0', 10);
-
-    const redis = getRedis();
     const token = req.cookies.get(ssoConfig.cookies.session.name)?.value;
-    const session = decodeJWT(token);
-    console.log('session', session);
-    const isSessionValid = await redis.exists(RedisKeys.clientSession + session?.sid);
-    const isTokenExpired = typeof session?.exp === 'number' && session.exp <= Math.floor(Date.now() / 1000);
-
-    const isLoggedIn = !!session && !isTokenExpired;
+    const isLoggedIn = await isSessionValid(token);
 
     if (isPublicRoute) return NextResponse.next();
 
-    console.log('isLoggedIn', isLoggedIn, 'IsSessionValid', isSessionValid);
-
-    if (!isSessionValid) {
+    if (!isLoggedIn) {
         if (ssoRedirectCount >= 3) {
             return NextResponse.redirect(new URL('/error?error=SSO redirect limit exceeded', req.url));
         }

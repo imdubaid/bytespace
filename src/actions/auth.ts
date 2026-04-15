@@ -16,13 +16,23 @@ export async function auth(): Promise<Session | null> {
     return decodeJWT(token);
 }
 
-export async function isSessionValid(): Promise<boolean> {
-    const redis = getRedis();
-    const session = await auth();
-    if (!session) return false;
+export async function isSessionValid(token?: string): Promise<boolean> {
+    if (!token) return false;
 
-    const isSessionValid = await redis.get(RedisKeys.clientSession + session.sid);
-    return !!isSessionValid;
+    try {
+        const redis = getRedis();
+        const session = decodeJWT(token);
+        if (!session) return false;
+
+        const isTokenExpired = typeof session?.exp === 'number' && session.exp <= Math.floor(Date.now() / 1000);
+        if (isTokenExpired) return false;
+
+        const isSessionValid = await redis.get(RedisKeys.clientSession + session.sid);
+        return !!isSessionValid;
+    } catch (error) {
+        console.error('Error checking session validity:', error);
+        return false;
+    }
 }
 
 export async function logout() {
