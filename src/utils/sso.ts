@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { publicRoutes } from '@/routes';
 import { getAbsolutePath } from '@/utils/helpers';
+import { ssoConfig } from '@/configs/sso';
 
 export function deleteCookies(res: NextResponse) {
     res.cookies.delete('sso_attempted');
@@ -25,4 +26,18 @@ export function next(path?: string): NextResponse {
     const response = NextResponse.redirect(target);
     deleteCookies(response);
     return response;
+}
+
+// Suggested function name: getSSOAuthorizationURL
+export function getSSOAuthorizationURL(next?: string) {
+    if (!next) {
+        next = getAbsolutePath();
+    }
+
+    const authorize = new URL(ssoConfig.client.path.authorize, ssoConfig.client.host);
+    authorize.searchParams.set('client_id', ssoConfig.app.id);
+    authorize.searchParams.set('redirect_uri', ssoConfig.app.redirectURI);
+    authorize.searchParams.set('next', next);
+
+    return authorize;
 }

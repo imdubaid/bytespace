@@ -1,22 +1,15 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { IS_PRODUCTION } from '@/lib/env';
-import { ssoConfig } from '@/configs/sso';
-import { authRoutes } from '@/routes';
+import { getSSOAuthorizationURL } from '@/utils/sso';
 
 export async function GET(req: NextRequest) {
     const path = req.nextUrl.searchParams.get('path') ?? '/';
 
     const next = new URL(path, req.nextUrl.origin).href;
-    const redirectURI = `${req.nextUrl.origin}/api/sso/callback`;
+    const authURL = getSSOAuthorizationURL(next);
 
-    const authorize = new URL(authRoutes.auth);
-    authorize.searchParams.set('client_id', ssoConfig.app.id);
-    authorize.searchParams.set('redirect_uri', redirectURI);
-    authorize.searchParams.set('next', next);
-
-    const response = NextResponse.redirect(authorize);
-
+    const response = NextResponse.redirect(authURL);
     response.cookies.set('sso_attempted', 'true', {
         path: '/',
         httpOnly: true,

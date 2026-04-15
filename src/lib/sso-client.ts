@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { SSO_CLIENT } from './env';
+import { SSO_CLIENT_HOST } from './env';
 import { ssoConfig } from '@/configs/sso';
 
 export default axios.create({
-    baseURL: SSO_CLIENT,
+    baseURL: SSO_CLIENT_HOST,
     timeout: 10000,
     withCredentials: true,
     headers: {

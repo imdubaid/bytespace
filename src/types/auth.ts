@@ -1,3 +1,5 @@
+import { JwtPayload } from 'jwt-decode';
+
 export interface User {
     id?: string;
     name?: string | null;
@@ -6,7 +8,8 @@ export interface User {
     role?: string | null;
 }
 
-export interface Session {
+export interface Session extends JwtPayload {
     user?: User;
     expires: string;
+    sid: string;
 }

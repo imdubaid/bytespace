@@ -32,6 +32,7 @@ export const ssoConfig = {
         name: APP_NAME,
         secret: APP_SECRET,
         url: APP_URL,
+        redirectURI: `${APP_URL}/api/sso/callback`,
     },
 
     client: {
@@ -40,6 +41,7 @@ export const ssoConfig = {
             authorize: '/api/sso/authorize',
             token: '/api/sso/token',
             revoke: '/api/sso/revoke',
+            signIn: '/auth',
         },
     },
 };
